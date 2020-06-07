@@ -1,20 +1,34 @@
-## Time Series analysis
+## Time series analysis
 
 In this section we'll try a first approach to measure the impact of the Spanish confinement in twitter user activity. The data that we have consists of 17.000 timelines of Twitter users. We will calculate some of our measurements with the aggregated data of some users, some of them will be done with several examples and some of them will be computed with each of the timelines in the dataset.
 
-### Seasonality and trends
+###  Seasonality and trends
 
 We'll pick several timelines as example (700) and we will calculate the autocorrelation plot (`acf`), for every one of them and see if overall there is some seasonality.
 
-When we calculate the mean over all `acf`, we can see clearly
+When we calculate the mean over all `acf`s, we can see spikes at each $k$ multiple of 7. This means a clear tendency towards a weekly frequency period.
 
-would give us a higher value for the weeks. break between seasonality and trends gives us any valuable information. The data
+<iframe height='320' scrolling='no' src='../plots/timeseries-mean-acf.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+
+Now we are going to explore some examples of the weekly periodic timelines, decomposing them in (additive) trend/seasonal/residual series. We'll try to see if there is any pattern in the profiles whose timelines are being weekly periodic or not, and what are the rises and falls of twitter activity within the period.
+
+- Explore examples -> hores!!
+- All_profiles
+
+
 
 ### Linear breakpoints
 
-This method here will be applied to the whole set of timeseries. As we are trying to measure the effect of an intervention (confinement) in the overall set of users, it'll be useful to get a more simplified version of the timeseries, one that just gets the *essential* information, as we are dealing with a lot of timeseries. The function `breakpoints` in `R` package `strucchange` gives us the optimal breakpoints for the timeseries. Internally what this function does is optimizes a piecewise linear fit for each $i$ number of breaks up to $n$ (maximum number of breaks). Although it can be done in python, there is no efficient method to get the same result, and as we are dealing with a lot of timeseries, we'll stick to `R` with the wrapper for python `rpy`. 
+As our goal is to try to measure the effect of an intervention (confinement) in the overall set of users, it'll be useful to get a more simplified version of the timeseries, one that just gets the *essential* information, as we are dealing with a lot of timeseries. This method here will be applied to the whole set of timeseries.  The function `breakpoints` in `R` package `strucchange` gives us the optimal points where to break the time series so there is the least amount of breakpoints possible that describe the best the original time series.  Although it can be done in python, there is no efficient method to get the same result, and as we are dealing with a lot of timeseries, we'll stick to `R` with the wrapper for python `rpy`. 
 
-The code to 
+We'll go through an example of timeline to see how this function internally works. First we pick a random user (`id=1000092194961838080`) and plot its activity timeline:
+
+<figure style="text-align:center">
+    <iframe height='340' scrolling='no' src='../plots/timeseries-example-breakpoints.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.1 - Activity of user 1000092194961838080.</figcaption>
+</figure>
+
+The following code creates the breakpoints and retrieves the level of each interval:
 
 ```python
 from rpy2 import robjects
@@ -31,9 +45,41 @@ def get_breakpoints_and_levels(id_user):
     return {freq.index[int(i)]:fitted[int(i)] for i in [0.0]+list(breakpoints[0])}
 ```
 
+Internally what the function `breakpoints`does is optimizes a piecewise linear fit, for each $i$ number of breaks, up to $n$ (maximum number of breaks), and it compares among the `i`'s which is the best optimized interval.It does this by using Bayesian Information criterion $(BIC)$. $BIC$ is a common criterion to do model selection among finite set of models. It's a way to measure the maximum likelihood of a function with the minimum amount of complexity (without overfitting). We can see the results for this in the figure 2.
+
+<figure style="text-align:center">
+    <img src='../plots/static/timeseries-BIC-breakpoints.png' height=350>
+    <figcaption>Fig.2 - BIC for the optimized interval for each number of breakpoints. In the case of the example the best description of the timeseries with the least breakpoints is with 3 breakpoints (4 intervals)</figcaption>
+</figure>
+
+Another `R` function that appears in the code is `fitted`, retrieves the level of each interval, also computed by the `breakpoints` function. The final result for each
+
+<figure style="text-align:center">
+    <iframe height='340' scrolling='no' src='../plots/timeseries-example-breakpoints-s.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.3 - Activity of user 1000092194961838080 with breakpoints and levels.</figcaption>
+</figure>
+
+As we did this for every profile in the dataset, we'll try to see some general trends. One of the problems that we'll encounter throughout this paper is the what we will call *starting date problem*. This consists in not having a consistent date from which we begin to have the activities of the user activities in our data. This is because we took the timelines not homogenously and also Twitter API gets only the latest 3200 activities from a user, that creates a correlation between the first recorded date of the user and its activity frequency. When we want to extract general conclusions of how a period of time affected the users we need to take that into account. 
+
+[timelines activities viz?]
+
+For this we'll compute the jump value for every timeline, that means for each breakpoint, we'll compute  how much it changed from previous value. To not have frequency biases we'll normalize this value for dsdasdasdasdasdasd In the case of the example:
+
+
+
+In the example we had
+
+We'll also normalize the jump with the overall mean of the user, so 
+
+- All_profiles relation
+
+
+
 
 
 ### Examples of ARIMA
+
+Some of our timeseries are really dependent of external inputs. In order to create a model for our timeseries data, it may be we need to build this external inputs
 
 
 

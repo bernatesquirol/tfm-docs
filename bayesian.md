@@ -39,7 +39,7 @@ This model will fit a $\tau$ that will be the day of the _distribution change_. 
 
 ### Model fit
 
-The implementation is done with [Tensorflow probability](https://www.tensorflow.org/probability/) in Python 3.6. To fit the data into the model and get our posterior we'll use Markov Chain Monte Carlo algorithm. This algorithm what it does is finding the most probable parameters for a given prior by sampling from the prior and fitting the data. When we specify the priors, we create a n-dimensional surface that can be modified in certain ways, depending on the parameters. The MCMC algorithm travels the space of all possible surfaces and finds which have the higher probability to have generated our data. There are several types of MCMC algorithm that change how the optimization works, we'll use Hamiltonian Monte Carlo. We need to create our prior in the TFP language so the `tfp.mcmc.HamiltonianMonteCarlo` function can optimize it:
+The implementation is done with [Tensorflow probability](https://www.tensorflow.org/probability/) (TFP) in Python 3.6. To fit the data into the model and get our posterior we'll use Markov Chain Monte Carlo algorithm. This algorithm what it does is finding the most probable parameters for a given prior by sampling from the prior and fitting the data. When we specify the priors, we create a n-dimensional surface that can be modified in certain ways, depending on the parameters. The MCMC algorithm travels the space of all possible surfaces and finds which have the higher probability to have generated our data. There are several types of MCMC algorithm that change how the optimization works, we'll use Hamiltonian Monte Carlo. We need to create our prior in the TFP language so the `tfp.mcmc.HamiltonianMonteCarlo` function can optimize it:
 
 ```python
 def joint_log_prob(count_data, lambda_1, lambda_2, tau):
@@ -67,7 +67,7 @@ After this, we need to create the kernel, where tensorflow optimizes the functio
 
 ### Model test
 
-We'll fit here a series of artificial data, some of which will follow the prior, and some of which won't, to see how well it behaves. We've created a visualization for 
+We'll fit here a series of artificial data, some of which will follow the prior, and some of which won't, to see how well it behaves. 
 
 WIP
 
