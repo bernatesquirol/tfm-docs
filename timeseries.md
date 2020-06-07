@@ -8,7 +8,7 @@ We'll pick several timelines as example (700) and we will calculate the autocorr
 
 When we calculate the mean over all `acf`s, we can see spikes at each $k$ multiple of 7. This means a clear tendency towards a weekly frequency period.
 
-<iframe height='320' scrolling='no' src='../plots/timeseries-mean-acf.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+<iframe height='320' scrolling='no' src='../tfm-plots/timeseries-mean-acf.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
 
 Now we are going to explore some examples of the weekly periodic timelines, decomposing them in (additive) trend/seasonal/residual series. We'll try to see if there is any pattern in the profiles whose timelines are being weekly periodic or not, and what are the rises and falls of twitter activity within the period.
 
@@ -24,9 +24,10 @@ As our goal is to try to measure the effect of an intervention (confinement) in 
 We'll go through an example of timeline to see how this function internally works. First we pick a random user (`id=1000092194961838080`) and plot its activity timeline:
 
 <figure style="text-align:center">
-    <iframe height='340' scrolling='no' src='../plots/timeseries-example-breakpoints.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='340' scrolling='no' src='../tfm-plots/timeseries-example-breakpoints.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.1 - Activity of user 1000092194961838080.</figcaption>
 </figure>
+
 
 The following code creates the breakpoints and retrieves the level of each interval:
 
@@ -48,16 +49,18 @@ def get_breakpoints_and_levels(id_user):
 Internally what the function `breakpoints`does is optimizes a piecewise linear fit, for each $i$ number of breaks, up to $n$ (maximum number of breaks), and it compares among the `i`'s which is the best optimized interval.It does this by using Bayesian Information criterion $(BIC)$. $BIC$ is a common criterion to do model selection among finite set of models. It's a way to measure the maximum likelihood of a function with the minimum amount of complexity (without overfitting). We can see the results for this in the figure 2.
 
 <figure style="text-align:center">
-    <img src='../plots/static/timeseries-BIC-breakpoints.png' height=350>
+    <img src='../tfm-plots/static/timeseries-BIC-breakpoints.png' height=350>
     <figcaption>Fig.2 - BIC for the optimized interval for each number of breakpoints. In the case of the example the best description of the timeseries with the least breakpoints is with 3 breakpoints (4 intervals)</figcaption>
 </figure>
+
 
 Another `R` function that appears in the code is `fitted`, retrieves the level of each interval, also computed by the `breakpoints` function. The final result for each
 
 <figure style="text-align:center">
-    <iframe height='340' scrolling='no' src='../plots/timeseries-example-breakpoints-s.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='340' scrolling='no' src='../tfm-plots/timeseries-example-breakpoints-s.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.3 - Activity of user 1000092194961838080 with breakpoints and levels.</figcaption>
 </figure>
+
 
 As we did this for every profile in the dataset, we'll try to see some general trends. One of the problems that we'll encounter throughout this paper is the what we will call *starting date problem*. This consists in not having a consistent date from which we begin to have the activities of the user activities in our data. This is because we took the timelines not homogenously and also Twitter API gets only the latest 3200 activities from a user, that creates a correlation between the first recorded date of the user and its activity frequency. When we want to extract general conclusions of how a period of time affected the users we need to take that into account. 
 
