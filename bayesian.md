@@ -67,20 +67,85 @@ After this, we need to create the kernel, where tensorflow optimizes the functio
 
 ### Model test
 
-We'll fit here a series of artificial data, some of which will follow the prior, and some of which won't, to see how well it behaves. 
+We'll fit here a series of artificial data, some of which will follow the prior, and some of which won't, to see how well it behaves. In order to create artificial timelines, we'll create $\tau_i$ and $J_i$, that will be similar to breakpoints and levels we created in the [linear breakpoints](./timeseries.html#linear-breakpoints) section in the timeseries study, and we'll see how our model fits the data. The dictionary has as keys the dates of the breakpoints and as values the value of the expected tweet activity (expected value for $\lambda$) for the following period. The first key is always the beginning of the timeseries.
 
-WIP
+#### Single switch
 
-### Real data
+- $\text{E1}$ : `{2019-09-12: 3, 2020-03-09: 4}`, `pvalue=0.56`
 
-WIP
+<figure style="text-align:center">
+    <iframe height='425' scrolling='no' src='../tfm-plots/bayesian-test-3-4.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.1 - Change from 3 to 4 at 10th Mar.</figcaption>
+</figure>
+
+- $\text{E2:}$ `{2019-09-12: 3, 2020-03-09: 7}`, `pvalue=0.77`
+
+<figure style="text-align:center">
+    <iframe height='425' scrolling='no' src='../tfm-plots/bayesian-test-3-7.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.2 - Change λ from 3 to 7 at 10th Mar.</figcaption>
+</figure>
+
+- $\text{E3}$: `{2019-09-12: 3, 2020-01-22: 7}`, `pvalue=0.82`
+
+<figure style="text-align:center">
+    <iframe height='425' scrolling='no' src='../tfm-plots/bayesian-test-3-7-jan.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.2 - Change λ from 3 to 7 at 10th Mar.</figcaption>
+</figure>
+
+We can see two immediate observations from the previous plots:
+
+- We will have clearer distributions for $\tau$ when the change in the $\lambda_i$'s is large, as we expect $\tau$ to be only one day. The more unclear $\tau$ is, the wider will be $\lambda_2$ distribution.
+- We will have a thinner distribution in $\lambda_i$ when the change happens in the middle. Else we'll have more uncertainty (as we have less data) in one of them.
+
+#### Multiple switches
+
+The real data may have more than one switch, but our model assumes there is just one. 
+
+- $\text{E4}$: `{2019-09-12: 1, 2019-01-12: 5, 2020-03-02: 2}`, `pvalue=0.46`
+
+<figure style="text-align:center">
+    <iframe height='425' scrolling='no' src='../tfm-plots/bayesian-test-3-7-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.2 - Change λ from 3 to 7 at 10th Mar.</figcaption>
+</figure>
+
+- $\text{E5}$: `{2019-09-12: 1, 2019-10-12: 5, 2020-03-02: 2}`, `pvalue=0.50`
+
+<figure style="text-align:center">
+    <iframe height='425' scrolling='no' src='../tfm-plots/bayesian-test-3-7-2-bis.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.4 - Change λ from 3 to 7 at 10th Mar.</figcaption>
+</figure>
+- $\text{E6}$: `{2019-09-12: 1, 2019-11-13: 5, 2020-01-13: 1, 2020-03-14: 5}`, `pvalue=0.01`
+
+<figure style="text-align:center">
+    <iframe height='425' scrolling='no' src='../tfm-plots/bayesian-test-1-5-1-5.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.4 - Change λ from 1 to 5 at 13th Oct and 14 Apr.</figcaption>
+</figure>
+
+In the previous examples we can see how in case of two changes, or three changes, the model will get only one of them.
+
+#### Real data
+
+We fitted the model with 20.000 samples for every timeline in the database. We generated an adaptation of the frequentist Kolmogorov-Smirnov test, to get a notion of distance and fitness to the real data. That's where the `pvalue` in the examples $\text{E1-6}$ comes from.  We compute different artificial datasets based on the model we found and average the `pvalue` of the KS-test between the artificial dataset and the sample.
+
+- binormal lambda! example & fix
 
 ### Other Models
 
-WIP
+We also analysed other models for a given example. We couldn't run these models in the whole dataset, as it would take too long. To compare models we used *Bayesian factor*.
 
 - switchpoint vs e^x
-- few switchpoints
+
+
+
+- multiple switchpoints
+
+
+
+### Timelines analysis
+
+
+
+
 
 <!--stackedit_data:
 eyJoaXN0b3J5IjpbLTE0OTEzNDQyNTYsNDU1MjY1NTgwXX0=

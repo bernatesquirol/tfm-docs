@@ -13,9 +13,9 @@ When we calculate the mean over all `acf`s, we can see spikes at each $k$ multip
 Now we are going to explore some examples of the weekly periodic timelines, decomposing them in (additive) trend/seasonal/residual series. We'll try to see if there is any pattern in the profiles whose timelines are being weekly periodic or not, and what are the rises and falls of twitter activity within the period.
 
 - Explore examples -> hores!!
-- All_profiles
+- All_profiles analysis
 
-
+What does it mean to be periodic in twitter user terms?
 
 ### Linear breakpoints
 
@@ -27,6 +27,7 @@ We'll go through an example of timeline to see how this function internally work
     <iframe height='340' scrolling='no' src='../tfm-plots/timeseries-example-breakpoints.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.1 - Activity of user 1000092194961838080.</figcaption>
 </figure>
+
 
 
 The following code creates the breakpoints and retrieves the level of each interval:
@@ -46,7 +47,7 @@ def get_breakpoints_and_levels(id_user):
     return {freq.index[int(i)]:fitted[int(i)] for i in [0.0]+list(breakpoints[0])}
 ```
 
-Internally what the function `breakpoints`does is optimizes a piecewise linear fit, for each $i$ number of breaks, up to $n$ (maximum number of breaks), and it compares among the `i`'s which is the best optimized interval.It does this by using Bayesian Information criterion $(BIC)$. $BIC$ is a common criterion to do model selection among finite set of models. It's a way to measure the maximum likelihood of a function with the minimum amount of complexity (without overfitting). We can see the results for this in the figure 2.
+Internally what the function `breakpoints`does is optimizes a piecewise linear fit, for each $i$ number of breaks, up to $n$ (maximum number of breaks), and it compares among the `i`'s which is the best optimized interval. It does this by using Bayesian Information criterion $(BIC)$. $BIC$ is a common criterion to do model selection among finite set of models. It's a way to measure the maximum likelihood of a function with the minimum amount of complexity (without overfitting). We can see the results for this in the figure 2.
 
 <figure style="text-align:center">
     <img src='../tfm-plots/static/timeseries-BIC-breakpoints.png' height=350>
@@ -62,25 +63,62 @@ Another `R` function that appears in the code is `fitted`, retrieves the level o
 </figure>
 
 
-As we did this for every profile in the dataset, we'll try to see some general trends. One of the problems that we'll encounter throughout this paper is the what we will call *starting date problem*. This consists in not having a consistent date from which we begin to have the activities of the user activities in our data. This is because we took the timelines not homogenously and also Twitter API gets only the latest 3200 activities from a user, that creates a correlation between the first recorded date of the user and its activity frequency. When we want to extract general conclusions of how a period of time affected the users we need to take that into account. 
+As we did this for every profile in the dataset, we'll try to see some general insights. One of the problems that we'll encounter throughout this paper is the what we will call *starting date problem*. This consists in not having a consistent date from which we begin to have the activities of the user activities in our data. This is because we took the timelines not homogenously and also Twitter API gets only the latest 3200 activities from a user, that creates a correlation between the first recorded date of the user and its activity frequency. When we want to extract general conclusions of how a period of time affected the users we need to take that into account. 
 
 [timelines activities viz?]
 
-For this we'll compute the jump value for every timeline, that means for each breakpoint, we'll compute  how much it changed from previous value. To not have frequency biases we'll normalize this value for dsdasdasdasdasdasd In the case of the example:
+For this we'll compute the jump value for every timeline, that means for each breakpoint, we'll compute  how much it changed from previous value. To not have frequency biases we'll normalize this value for the mean of the timeline. 
+$$
+\begin{equation*}
+\bar N:= \text{observed mean}\\
+\tau_i:= \text{date of the breakpoint}\\
+L_i:= \text{level of the interval previous to the breakpoint}\\
+
+J_i:=L_{i+1}-L_i\\
+J'_i:=\frac{J_i}{\bar N}
+\end{equation*}
+$$
+
+In the case of the example:
+$$
+\begin{equation}
+\bar N=3.57\\
+\tau_0=\text{08-Nov-19},  J_0=2.43, J'_0=0.68 \\  \tau_1=\text{16-Feb-20},J_1=4.16, J'_1=1.16\\  \tau_2=\text{30-Mar-20},J_2 = -4.86, J'_2=1.37
+\end{equation}
+$$
+
+- allprofiles analysis
+  - num breakpoints
+  - deviation breakpoints
+
+
+### Analysis
 
 
 
-In the example we had
-
-We'll also normalize the jump with the overall mean of the user, so 
-
-- All_profiles relation
-
+<figure style="text-align:center">
+    <iframe height='340' scrolling='no' src='../tfm-plots/timeseries-sum-js.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.4 - Sum of changes relative to the mean (J') from all timelines.</figcaption>
+</figure>
 
 
 
 
-### Examples of ARIMA
+### ARIMA models [no TFM]
+
+We will fit and test three ARIMA models with the help of the information we gathered so far. 
+
+**Model 1: not seasonal**
+
+**Model 2: seasonal (lag=7)**
+
+As we have seen in the first part of this paper, some of the timelines in the dataset have the seasonality of lag 7 (weekly).
+
+**Model 3: seasonal with shift regressors**
+
+
+
+
 
 Some of our timeseries are really dependent of external inputs. In order to create a model for our timeseries data, it may be we need to build this external inputs
 
