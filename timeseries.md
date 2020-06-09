@@ -12,10 +12,9 @@ When we calculate the mean over all `acf`s, we can see spikes at each $k$ multip
 
 Now we are going to explore some examples of the weekly periodic timelines, decomposing them in (additive) trend/seasonal/residual series. We'll try to see if there is any pattern in the profiles whose timelines are being weekly periodic or not, and what are the rises and falls of twitter activity within the period.
 
-- Explore examples -> hores!!
-- All_profiles analysis
+- Explore example
 
-What does it mean to be periodic in twitter user terms?
+
 
 ### Linear breakpoints
 
@@ -87,12 +86,17 @@ $$
 \end{equation}
 $$
 
-- allprofiles analysis
-  - num breakpoints
-  - deviation breakpoints
 
 
 ### Analysis
+
+- Seasonality -> per period, per type
+
+- Num breakpoints -> per period, per type
+- Deviation breakpoints -> per period, per type
+- J's
+  - J's per type
+  - Total J's
 
 
 
@@ -100,7 +104,6 @@ $$
     <iframe height='340' scrolling='no' src='../tfm-plots/timeseries-sum-js.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.4 - Sum of changes relative to the mean (J') from all timelines.</figcaption>
 </figure>
-
 
 
 
@@ -117,10 +120,6 @@ As we have seen in the first part of this paper, some of the timelines in the da
 **Model 3: seasonal with shift regressors**
 
 
-
-
-
-Some of our timeseries are really dependent of external inputs. In order to create a model for our timeseries data, it may be we need to build this external inputs
 
 
 

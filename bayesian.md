@@ -125,7 +125,7 @@ In the previous examples we can see how in case of two changes, or three changes
 
 #### Real data
 
-We fitted the model with 20.000 samples for every timeline in the database. We generated an adaptation of the frequentist Kolmogorov-Smirnov test, to get a notion of distance and fitness to the real data. That's where the `pvalue` in the examples $\text{E1-6}$ comes from.  We compute different artificial datasets based on the model we found and average the `pvalue` of the KS-test between the artificial dataset and the sample.
+We fitted the model with 20.000 samples for every timeline in the database. We generated an adaptation of the frequentist Kolmogorov-Smirnov test, to get a notion of fitness to the real data. That's where the `pvalue` in the examples $\text{E1-6}$ comes from.  We compute different artificial datasets based on the model we found and average the `pvalue` of the KS-test between the artificial dataset and the sample. Let's explore some real timelines and see how the model perfoms.
 
 - binormal lambda! example & fix
 
@@ -135,13 +135,12 @@ We also analysed other models for a given example. We couldn't run these models 
 
 - switchpoint vs e^x
 
-
-
 - multiple switchpoints
 
+### Analysis
 
-
-### Timelines analysis
+- global lambda tau plot & typed
+- test ks models
 
 
 
