@@ -259,9 +259,10 @@ AIC=1267.78   AICc=1268.02   BIC=1285.5
 The problem in fitting the Arima model with regressors is that, if we want to predict, we need the regressor as input. If we could have an overall estimate of how 
 
 <figure style="text-align:center">
-    <iframe height='520' scrolling='no' src='../tfm-plots/index.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='520' scrolling='no' src='../tfm-plots/residuals-slider.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.4 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
+
 
 
 
