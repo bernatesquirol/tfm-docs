@@ -2,7 +2,7 @@
 
 ### Prior
 
-In order to measure the impact of the Spanish confinement in twitter, we will analyse multiple users timelines and we'll fit a *Bayesian switchpoint* model for each timeline. This is a very basic model that assumes that there is one day ($\tau$) the user changes its behaviour, either increasing the frequency of tweet or decreasing it.
+In order to measure the impact of the Spanish confinement in twitter, we will analyse multiple users timelines and we'll fit a *Bayesian switchpoint* model for each timeline. This is a very basic model that assumes that there is one day ($\tau$) the user changes its behaviour, either increasing the frequency of tweet or decreasing it. The fact that we have just one switchpoint will be great for our analysis, as we have a huge collection of timelines, and we want to extract a *minimalist* model.
 
 We'll call $N_{i}$ to the expected number twitter actions for the day $i$ for the given user. $A_i$ will be modelled following a $\text{Poisson}$ distribution and at day $\tau$ the parameter of the distribution will change from $\lambda_1$ to $\lambda_2$.  The $\text{Poisson}$ distribution is defined as:
 $$
@@ -69,6 +69,8 @@ After this, we need to create the kernel, where tensorflow optimizes the functio
 
 We'll fit here a series of artificial data, some of which will follow the prior, and some of which won't, to see how well it behaves. In order to create artificial timelines, we'll create $\tau_i$ and $J_i$, that will be similar to breakpoints and levels we created in the [linear breakpoints](./timeseries.html#linear-breakpoints) section in the timeseries study, and we'll see how our model fits the data. The dictionary has as keys the dates of the breakpoints and as values the value of the expected tweet activity (expected value for $\lambda$) for the following period. The first key is always the beginning of the timeseries.
 
+We'll use `pvalue` to get a notion of model fitness to the real data. We used an adaptation of the frequentist Kolmogorov-Smirnov test.  We compute different artificial datasets based on the model we found and average the `pvalue` of the KS-test between those artificial datasets and the sample, (that here is also artificial, based on the dictionary).
+
 #### Single switch
 
 - $\text{E1}$ : `{2019-09-12: 3, 2020-03-09: 4}`, `pvalue=0.56`
@@ -120,26 +122,47 @@ The real data may have more than one switch, but our model assumes there is just
     <iframe height='425' scrolling='no' src='../tfm-plots/bayesian-test-1-5-1-5.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.4 - Change λ from 1 to 5 at 13th Oct and 14 Apr.</figcaption>
 </figure>
+In the previous examples we can see how in case of two changes, or three changes, the model will get only one of them. We can see how the `pvalue` is way lower in this example. As we have seen, the we can use the `pvalue` as a way of knowing if there are some breakpoints that we missed in the model. When the `pvalue` is low doesn't mean that the model is wrong, the model will have choosen one of the breakpoints that the data will have, but probably other breakpoints may exist.
 
-In the previous examples we can see how in case of two changes, or three changes, the model will get only one of them.
+
 
 #### Real data
 
-We fitted the model with 20.000 samples for every timeline in the database. We generated an adaptation of the frequentist Kolmogorov-Smirnov test, to get a notion of fitness to the real data. That's where the `pvalue` in the examples $\text{E1-6}$ comes from.  We compute different artificial datasets based on the model we found and average the `pvalue` of the KS-test between the artificial dataset and the sample. Let's explore some real timelines and see how the model perfoms.
+We fitted the model with 20.000 samples for every timeline in the database. Let's explore some real timelines and see how the model perfoms.
 
-- binormal lambda! example & fix
+- `user_id=455018574, pvalue=0.24`
+
+<figure style="text-align:center">
+    <iframe height='425' scrolling='no' src='../tfm-plots/real-case-1.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.5 - Real example.</figcaption>
+</figure>
+
+- `user_id=112894609, pvalue=0.0036`
+
+<figure style="text-align:center">
+    <iframe height='425' scrolling='no' src='../tfm-plots/multi-lambda.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.6 - Multi lambda example.</figcaption>
+</figure>
+
+The $\text{Fig.6}$ shows something new. If we look at both distributions of $\lambda_i$ they appear to have a binormal distribution. If we look at the $\tau$ we can also see two bumps, one in February 22nd and another in March. What is happening here, is that there are two switchpoints, the rising in February and the decreasing of activity in March. We can see how the rising in March corresponds probably to the part of $\lambda_2 \sim 7.5$ (as $\lambda_1$ needs to be lower that $\lambda_2$) and after March, we would have a $\lambda_3\sim5.6$, that is hidden in $\lambda_2$. This will happen whenever the $\lambda_i$ are near and there are two switches. 
+
+To test the hypotesis that another breakpoint would create a better model, we created another model, based on the dictionary: `{2020-02-22:6.4, 2020-02-22:7.5, 2020-03-22:5.4}`, with a second breakpoint ($\tau_2$), and a $\lambda_3$. We adapted the `pvalue` test to create multiple timelines with the new model and we found a higher`pvalue=0.015`, while the model with only one switchpoint has a `pvalue=0.0036`.
 
 ### Other Models
 
-We also analysed other models for a given example. We couldn't run these models in the whole dataset, as it would take too long. To compare models we used *Bayesian factor*.
+We also analysed other models for a given example. We couldn't run these models in the whole dataset, as it would take too long.
 
 - switchpoint vs e^x
+- Another model
 
-- multiple switchpoints
+There is a question one must do to analyse our model, and is check 
 
 ### Analysis
 
-- global lambda tau plot & typed
+- global lambda tau plot & typed -> model_light
+
+
+
 - test ks models
 
 
