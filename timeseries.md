@@ -21,8 +21,9 @@ We'll go through an example of timeline to see how this function internally work
 
 <figure style="text-align:center">
     <iframe height='340' scrolling='no' src='../tfm-plots/timeseries-example-breakpoints.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.1 - Activity of user 1000092194961838080.</figcaption>
+    <figcaption>Fig.2 - Activity of user 1000092194961838080.</figcaption>
 </figure>
+
 
 
 
@@ -47,8 +48,9 @@ Internally what the function `breakpoints`does is optimizes a piecewise linear f
 
 <figure style="text-align:center">
     <img src='../tfm-plots/static/timeseries-BIC-breakpoints.png' height=350>
-    <figcaption>Fig.2 - BIC for the optimized interval for each number of breakpoints. In the case of the example the best description of the timeseries with the least breakpoints is with 3 breakpoints (4 intervals)</figcaption>
+    <figcaption>Fig.3 - BIC for the optimized interval for each number of breakpoints. In the case of the example the best description of the timeseries with the least breakpoints is with 3 breakpoints (4 intervals)</figcaption>
 </figure>
+
 
 
 Another `R` function that appears in the code is `fitted`, retrieves the level of each interval, also computed by the `breakpoints` function. The final result for each
@@ -60,8 +62,6 @@ Another `R` function that appears in the code is `fitted`, retrieves the level o
 
 
 As we did this for every profile in the dataset, we'll try to see some general insights. One of the problems that we'll encounter throughout this paper is the what we will call *initial date problem*. This consists in not having a consistent date from which we begin to have the activities of the user activities in our data. This is because we took the timelines not homogenously and also Twitter API gets only the latest 3200 activities from a user, that creates a correlation between the first recorded date of the user and its activity frequency. When we want to extract general conclusions of how a period of time affected the users we need to take that into account. 
-
-[timelines activities viz?]
 
 For this we'll compute the jump value for every timeline, that means for each breakpoint, we'll compute  how much it changed from previous value. To not have frequency biases we'll normalize this value for the mean of the timeline. 
 $$
@@ -100,24 +100,26 @@ We have computed the `seasonal_decompose` of each timeline in our database, that
 
 #### Breakpoints
 
-- Num breakpoints -> per period, per type
+Here we plot the number of breakpoints per type of user, we can see that is mostly similar among user types. We can also see a trend towards 2-3 breaks and not more, so we can say that the maximum of 5 breakpoints we stablished was a good enough approach.
 
 <figure style="text-align:center">
     <iframe height='370' scrolling='no' src='../tfm-plots/timeseries-breakpoints-analysis.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.4 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
+    <figcaption>Fig.5 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
+
 
 #### Levels
 
 <figure style="text-align:center">
     <iframe height='820' scrolling='no' src='../tfm-plots/timeseries-sum-js-types.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.4 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
+    <figcaption>Fig.6 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
 
 <figure style="text-align:center">
     <iframe height='520' scrolling='no' src='../tfm-plots/timeseries-sum-js-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.4 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
+    <figcaption>Fig.7 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
+
 
 
 
@@ -125,8 +127,6 @@ We have computed the `seasonal_decompose` of each timeline in our database, that
 ### ARIMA models
 
 We will fit and test three ARIMA models in our example with the help of the information we gathered so far.  
-
-- Explain ARIMA
 
 **Model 1: autoarima**
 
@@ -191,8 +191,6 @@ sigma^2 estimated as 9.339:  log likelihood=-645.7
 AIC=1299.39   AICc=1299.55   BIC=1313.56
 ```
 
-
-
 ```python
 model_2_2 = robjects.r['Arima'](
     env['freq_tweet'], 
@@ -216,12 +214,10 @@ AIC=1299.16   AICc=1299.32   BIC=1313.32
 
 **Model 3: seasonal with shift regressors**
 
-- What are regressors
-
 If we check again the `auto.arima` function, this time with regressors, we get the best
 
 ```python
-model_4_1 = robjects.r['auto.arima'](env['freq_tweet'], trace=True, xreg=fitted, )
+model_3_1 = robjects.r['auto.arima'](env['freq_tweet'], trace=True, xreg=fitted, )
 ```
 
 ```R
@@ -238,7 +234,7 @@ AIC=1270.99   AICc=1271.09   BIC=1281.63
 If we add temporality:
 
 ```python
-model_4_2 =  robjects.r['Arima'](
+model_3_2 =  robjects.r['Arima'](
     env['freq_tweet'], 
     order = robjects.IntVector([0,0,1]), 
     xreg=fitted,
@@ -256,19 +252,16 @@ sigma^2 estimated as 8.086:  log likelihood=-628.89
 AIC=1267.78   AICc=1268.02   BIC=1285.5
 ```
 
-The problem in fitting the Arima model with regressors is that, if we want to predict, we need the regressor as input. If we could have an overall estimate of how 
+When fitting the arima model with regressors we have that, if we want to predict, we need the regressor as input, the level at which we predict. If we could have an overall estimate of how the level changes for the user, we could predict with the regressor model an accurate timeline for the user.
+
+**Residuals of the models**
 
 <figure style="text-align:center">
     <iframe height='520' scrolling='no' src='../tfm-plots/residuals-slider.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.4 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
+    <figcaption>Fig.8 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
 
-
-
-
-Time Series Analysis With Applications in R by Jonathan D. Cryer, Kung-Sik Chan
-
-- Explain residua
+The p-values for our models are in the following table. We can see how model 3.1 presents p-values less than 0.1 in some of the lags. We should not consider the 3.1 model for further research.
 
 | k\model | 1        | 2_1      | 2_2      | 3_1          | 3_2      |
 | ------: | -------- | -------- | -------- | ------------ | -------- |
@@ -283,8 +276,26 @@ Time Series Analysis With Applications in R by Jonathan D. Cryer, Kung-Sik Chan
 |       9 | 0.855799 | 0.990754 | 0.995835 | 0.189310     | 0.770193 |
 |      10 | 0.903568 | 0.995453 | 0.998018 | 0.252571     | 0.832601 |
 
- https://datascienceplus.com/arima-models-and-intervention-analysis/
+### References
 
-https://www.seanabu.com/2016/03/22/time-series-seasonal-ARIMA-model-in-python/
+ARIMA models and Intervention Analysis
 
-https://www.analyticsvidhya.com/blog/2016/02/time-series-forecasting-codes-python/
+*Giorgio Garziano*
+
+https://datascienceplus.com/arima-models-and-intervention-analysis/
+
+
+
+Time Series Analysis With Applications in R
+
+*Jonathan D. Cryer, Kung-Sik Chan*
+
+https://www.springer.com/us/book/9780387759586
+
+ 
+
+ARIMA models with regressors
+
+*Robert Nau*
+
+https://people.duke.edu/~rnau/arimreg.htm
