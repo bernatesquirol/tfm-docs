@@ -1,26 +1,26 @@
-## Time series analysis
+# Time series analysis
 
 In this section we'll try a first approach to measure the impact of the Spanish confinement in twitter user activity. The data that we have consists of 17.000 timelines of Twitter users. We will calculate some of our measurements with the aggregated data of some users, some of them will be done with several examples and some of them will be computed with each of the timelines in the dataset.
 
-###  Seasonality and trends
+##  Seasonality and trends
 
 We'll pick several timelines as example (700) and we will calculate the autocorrelation plot (`acf`), for every one of them and see if overall there is some seasonality.
 
 When we calculate the mean over all `acf`s, we can see spikes at each $k$ multiple of 7. This means a clear tendency towards a weekly frequency period.
 
 <figure style="text-align:center">
-    <iframe height='320' scrolling='no' src='../tfm-plots/timeseries-mean-acf.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
+    <iframe height='320' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-mean-acf.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
     <figcaption>Fig.1 - Mean acf for 700 samples.</figcaption>
 </figure>
 
-### Linear breakpoints
+## Linear breakpoints
 
 As our goal is to try to measure the effect of an intervention (confinement) in the overall set of users, it'll be useful to get a more simplified version of the timeseries, one that just gets the *essential* information, as we are dealing with a lot of timeseries. This method here will be applied to the whole set of timeseries.  The function `breakpoints` in `R` package `strucchange` gives us the optimal points where to break the time series so there is the least amount of breakpoints possible that describe the best the original time series.  Although it can be done in python, there is no efficient method to get the same result, and as we are dealing with a lot of timeseries, we'll stick to `R` with the wrapper for python `rpy`. 
 
 We'll go through an example of timeline to see how this function internally works. We'll pick one example for the sake of explainability, with the Twitter activity plotted in $\text{Fig.1}$.
 
 <figure style="text-align:center">
-    <iframe height='340' scrolling='no' src='../tfm-plots/timeseries-example-breakpoints.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='340' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-example-breakpoints.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.2 - Activity of user 1000092194961838080.</figcaption>
 </figure>
 
@@ -47,7 +47,7 @@ def get_breakpoints_and_levels(id_user):
 Internally what the function `breakpoints`does is optimizes a piecewise linear fit, for each $i$ number of breaks, up to $n$ (maximum number of breaks), and it compares among the `i`'s which is the best optimized interval. It does this by using Bayesian Information criterion $(BIC)$. $BIC$ is a common criterion to do model selection among finite set of models. It's a way to measure the maximum likelihood of a function with the minimum amount of complexity (without overfitting). We can see the results for this in the figure 2. We'll stablish the maximum number of breaks in $n=5$.
 
 <figure style="text-align:center">
-    <img src='../tfm-plots/static/timeseries-BIC-breakpoints.png' height=350>
+    <img src='https://bernatesquirol.github.io/tfm-plots/static/timeseries-BIC-breakpoints.png' height=350>
     <figcaption>Fig.3 - BIC for the optimized interval for each number of breakpoints. In the case of the example the best description of the timeseries with the least breakpoints is with 3 breakpoints (4 intervals)</figcaption>
 </figure>
 
@@ -56,7 +56,7 @@ Internally what the function `breakpoints`does is optimizes a piecewise linear f
 Another `R` function that appears in the code is `fitted`, retrieves the level of each interval, also computed by the `breakpoints` function. The final result for each
 
 <figure style="text-align:center">
-    <iframe height='340' scrolling='no' src='../tfm-plots/timeseries-example-breakpoints-s.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='340' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-example-breakpoints-s.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.3 - Activity of user 1000092194961838080 with breakpoints and levels.</figcaption>
 </figure>
 
@@ -85,38 +85,35 @@ $$
 
 With the label **`levels_dict`** we'll add a dictionary with keys $\tau_i$ and values $L_i$ as as a feature in our users database.
 
-### Analysis
+## Analysis
 
 In this section we'll analyse certain aspects of the features we have computed so far.
 
-#### Seasonality
+### Seasonality
 
 We have computed the `seasonal_decompose` of each timeline in our database, that means decomposing the activity in (additive) trend/seasonal/residual series. The plot in $\text{Fig.4}$ we can see the differences between user types. We have a lot less politicians than any other group, this why is so different than the other types.
 
 <figure style="text-align:center">
-    <iframe height='420' scrolling='no' src='../tfm-plots/timeseries-seasonal-type.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='420' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-seasonal-type.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.4 - Sum of changes relative to the mean (J') from all timelines.</figcaption>
 </figure>
-
-#### Breakpoints
+### Breakpoints
 
 Here we plot the number of breakpoints per type of user, we can see that is mostly similar among user types. We can also see a trend towards 2-3 breaks and not more, so we can say that the maximum of 5 breakpoints we stablished was a good enough approach.
 
 <figure style="text-align:center">
-    <iframe height='370' scrolling='no' src='../tfm-plots/timeseries-breakpoints-analysis.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='370' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-breakpoints-analysis.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.5 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
-
-
-#### Levels
+### Levels
 
 <figure style="text-align:center">
-    <iframe height='820' scrolling='no' src='../tfm-plots/timeseries-sum-js-types.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='820' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-sum-js-types.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.6 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
 
 <figure style="text-align:center">
-    <iframe height='520' scrolling='no' src='../tfm-plots/timeseries-sum-js-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='520' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-sum-js-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.7 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
 
@@ -124,7 +121,7 @@ Here we plot the number of breakpoints per type of user, we can see that is most
 
 
 
-### ARIMA models
+## ARIMA models
 
 We will fit and test three ARIMA models in our example with the help of the information we gathered so far.  
 
@@ -202,9 +199,7 @@ model_2_2 = robjects.r['Arima'](
 ```R
 Coefficients:
           ma1      ma2    sar1
-
       -0.6858  -0.1341  0.0989
-
 s.e.   0.0609   0.0662  0.0632
 sigma^2 estimated as 9.331:  log likelihood=-645.58
 AIC=1299.16   AICc=1299.32   BIC=1313.32
@@ -257,11 +252,11 @@ When fitting the arima model with regressors we have that, if we want to predict
 **Residuals of the models**
 
 <figure style="text-align:center">
-    <iframe height='520' scrolling='no' src='../tfm-plots/residuals-slider.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='520' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/residuals-slider.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.8 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
 
-The p-values for our models are in the following table. We can see how model 3.1 presents p-values less than 0.1 in some of the lags. We should not consider the 3.1 model for further research.
+The p-values for our models are in the following table. We can see how model 3.1 presents p-values less than 0.1 in some of the lags. We should not consider the 3.1 model for further research. 
 
 | k\model | 1        | 2_1      | 2_2      | 3_1          | 3_2      |
 | ------: | -------- | -------- | -------- | ------------ | -------- |
@@ -276,26 +271,13 @@ The p-values for our models are in the following table. We can see how model 3.1
 |       9 | 0.855799 | 0.990754 | 0.995835 | 0.189310     | 0.770193 |
 |      10 | 0.903568 | 0.995453 | 0.998018 | 0.252571     | 0.832601 |
 
-### References
+## References
 
-ARIMA models and Intervention Analysis
+<a name="ref1">**[ 1 ]**</a>: Britt, Brian. (2015). *Stepwise Segmented Regression Analysis: An Iterative Statistical Algorithm to Detect and Quantify Evolutionary and Revolutionary Transformations in Longitudinal Data*. 125-144. 10.1007/978-3-319-18552-1_7. https://www.researchgate.net/publication/285613712_Stepwise_Segmented_Regression_Analysis_An_Iterative_Statistical_Algorithm_to_Detect_and_Quantify_Evolutionary_and_Revolutionary_Transformations_in_Longitudinal_Data 
 
-*Giorgio Garziano*
+<a name="ref2">**[ 2 ]**</a>: Giorgio Garziano. (2017). *ARIMA models and Intervention Analysis*. https://www.r-bloggers.com/arima-models-and-intervention-analysis/
 
-https://datascienceplus.com/arima-models-and-intervention-analysis/
+<a name="ref3">**[ 3 ]**</a>:Cryer, Jonathan &amp; Chan, K.-S. (2008). *Time Series Analysis: With Applications in R*. 10.1007/978-0-387-75959-3. https://www.springer.com/us/book/9780387759586 
 
 
 
-Time Series Analysis With Applications in R
-
-*Jonathan D. Cryer, Kung-Sik Chan*
-
-https://www.springer.com/us/book/9780387759586
-
- 
-
-ARIMA models with regressors
-
-*Robert Nau*
-
-https://people.duke.edu/~rnau/arimreg.htm
