@@ -20,7 +20,7 @@ Given a user $u$, let's define:
 
 The significative others set ($O_s$) are the users that receive a significant larger amount of retweets than the others. Could be that the significative others set is empty, and thus we haven't an ego network for that given user.
 
-For the definition of $\text{Outliers}$ we will use what is stated in the paper [[1]](./#ref1), that introduces the skewness into the measurement of the outliers. With 
+For the definition of $\text{Outliers}$ we will use what is stated in the paper [[3]](#ref3), that introduces the skewness into the measurement of the outliers. With 
 $$
 Q_i := i\text{th quartile P} \\
 IQR:=Q_3-Q_1\\
@@ -30,18 +30,24 @@ We define:
 
 $$
 \text{Outliers}(P)=\{x|x\notin[Q_1 − h_l(MC) IQR; Q_3 + h_u(MC) IQR]\}\\
-h_l(MC) = 1.5e^{3MC}\\
-h_u(MC) = 1.5e^{-4MC}
+h_l(MC) = 1.5e^{-4MC}\\
+h_u(MC) = 1.5e^{3MC}
 $$
-In our case we'll only use the upper bound, as we have a right long tail, with the most frequently retweeted profiles in the right. 
+In our case we'll only use the upper bound ($\text{OutlierFrontier}(P)=Q_3 + h_u(MC) IQR$), as we have a right long tail, with the most frequently retweeted profiles in the right. 
 
 The *ego-significant-network* is the directed network having as nodes: the ego ($u$), and the outliers of its retweet distribution ($O_s(u)$). We'll have an directed edge between $u$ and $v$ if $v\in O_s(u)$. Of course the ego    ($u$) will have outgoing edges to all the other nodes in the graph. For every outlier $o_i\in O_s(u)$, we find its outliers ($O_s(o_i)$), and if the $o_{o_i}\in O_s(u)\cup{u}$ we'll add an edge from $o_i$ to $o_{o_i}=o_j\in O_s(u)\cup{u}$.
 
 <figure style="text-align:center">
     <iframe frameborder="0" style="width:100%;height:400px;" src="https://app.diagrams.net/?lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=Copy%20of%20EgoNetwork.drawio#Uhttps%3A%2F%2Fdrive.google.com%2Fuc%3Fid%3D1sr0CH8XmM9-gACD6xLYHk06G6z61Bpmt%26export%3Ddownload"></iframe>
-<figcaption>Fig.2 - Schema of ego-network.</figcaption>
+<figcaption>Fig.2 - Example of ego-network.</figcaption>
 </figure>
 
+### Example
+
+<figure style="text-align:center">
+    <iframe height='320' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/ego-networks-slider' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.4 - Fitting a gamma distribution to degree of the ego-networks for different users.</figcaption>
+</figure>
 
 
 ## Timeline networks analysis
@@ -55,11 +61,11 @@ $$
 \text{Degree}(G_u)={\#G_u-1}
 $$
 
-
 <figure style="text-align:center">
     <iframe height='520' scrolling='no' src='../tfm-plots/networks-degree-type.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
-    <figcaption>Fig.1 - Degree of the ego-network by type.</figcaption>
+    <figcaption>Fig.3 - Degree of the ego-network by type.</figcaption>
 </figure>
+
 
 **P-values for sampled Kolmogorov-Smirnov test **
 
@@ -70,19 +76,20 @@ $$
 | **random-follower** |   0.118161 |   0.185019 |        0.008606 |      0.078555 |
 |   **random-friend** |   0.060738 |   0.259250 |        0.078369 |      0.008491 |
 
-If we fit a $\text{Gamma}$ distribution to the histograms of the different user types, we find the results plotted in $\text{Fig.2}$ and $\text{Fig.3}$.
+If we fit a $\text{Gamma}$ distribution to the histograms of the different user types, we find the results plotted in $\text{Fig.4}$ and $\text{Fig.5}$.
 
 <figure style="text-align:center">
     <iframe height='320' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/degrees-slider' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.2 - Fitting a gamma distribution to degree of the ego-networks for different users.</figcaption>
+    <figcaption>Fig.4 - Fitting a gamma distribution to degree of the ego-networks for different users.</figcaption>
 </figure>
 
 <figure style="text-align:center">
     <img src='https://bernatesquirol.github.io/tfm-plots/static/degree-fits.png' height=250>
-    <figcaption>Fig.3 - Gamma fits plotted</figcaption>
+    <figcaption>Fig.5 - Gamma fits plotted</figcaption>
 </figure>
 
-We can see how the plot of the distribution. That means politicians tend to have more outliers than the other user types. We can also see that the QQ-plots in journalists and random users are very similar.
+
+We can see how the plot of the fitted distributions look like in $\text{Fig.5}$. That means politicians tend to have more outliers than the other user types. We can also see that the QQ-plots in journalists and random users are very similar, the $\text{Gamma}$ distribution fails in similar ways.
 
 ### Reciprocity
 
@@ -91,11 +98,11 @@ $$
 \text{Reciprocity}(G_u)=\frac{\#\{v\in{(G_u-u)}|(v,u)\in \text{Edges}(G_u)\}}{\#G_u-1}
 $$
 
-
 <figure style="text-align:center">
     <iframe height='520' scrolling='no' src='../tfm-plots/networks-ego-reciprocity-type.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
-    <figcaption>Fig.2 - Ego reciprocity by type.</figcaption>
+    <figcaption>Fig.6 - Ego reciprocity by type.</figcaption>
 </figure>
+
 **P-values for sampled Kolmogorov-Smirnov test**
 
 |                 | journalist | politician | random-follower | random-friend |
@@ -114,11 +121,11 @@ $$
 \text{OutlierConnectedness}(G_u)=\frac{\#\{v\in (G_u-{u})|\exist w\in (G_u-{u}),(v,w)\in \text{Edges}(G_u)\}}{(\#G_u-1)\times(\#G_u-2)}
 $$
 
-
 <figure style="text-align:center">
     <iframe height='520' scrolling='no' src='../tfm-plots/networks-outlier-connectedness.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
-    <figcaption>Fig.3 - Connections between outliers.</figcaption>
+    <figcaption>Fig.7 - Connections between outliers.</figcaption>
 </figure>
+
 **P-values for sampled Kolmogorov-Smirnov test **
 
 |                     | journalist | politician | random-follower | random-friend |
@@ -127,6 +134,8 @@ $$
 |      **politician** |   0.469169 |   0.048047 |        0.558213 |      0.488959 |
 | **random-follower** |   0.120751 |   0.559362 |        0.009477 |      0.076149 |
 |   **random-friend** |   0.059404 |   0.488519 |        0.076078 |      0.009497 |
+
+The connections between outliers are way more common among politicians, as their outliers are probably other politicians in the same party.
 
 ### Ego clustering
 
@@ -138,8 +147,9 @@ where $T(u)$ is the number of directed triangles through node $u$, $\operatornam
 
 <figure style="text-align:center">
     <iframe height='520' scrolling='no' src='../tfm-plots/networks-ego-clustering-type.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
-    <figcaption>Fig.4 - Clustering score for ego-node.</figcaption>
+    <figcaption>Fig.8 - Clustering score for ego-node.</figcaption>
 </figure>
+
 
 **P-values for sampled Kolmogorov-Smirnov test **
 
@@ -150,27 +160,88 @@ where $T(u)$ is the number of directed triangles through node $u$, $\operatornam
 | **random-follower** |   0.111391 |   0.664238 |        0.008437 |      0.036767 |
 |   **random-friend** |   0.085648 |   0.631700 |        0.036911 |      0.008309 |
 
-
+In fact the ego clustering and outlier connectedness are measuring a very similar thing, as in the graph, the ego has forward edges to all other nodes, and the more connections between outliers, the more triangles there will be through ego (more clustering).
 
 ## Evolving network
 
-In this section we'll measure the changes in the ego-network as the activity changes. We'll split the timeline of the user into the chunks we found in the [linear breakpoints section]() in order to have stationarity in the data. We'll then compute where is the outlier frontier for this chunk in percentage of the total retweeted amount. Then we'll input this percentage week by week during the breakpoints, we'll get a sense of stability of the network given given the level of activity. We'll do this only for an example to see if this is a good way to measure the ego-network stability.
+In this section we'll measure the changes in the ego-network as the activity changes. We'll split the timeline of the user into the temporal chunks ($\tau_i$) we found in the [linear breakpoints section]() in order to have stationarity in the data. We'll then compute where is the outlier frontier for this temporal interval $\tau_i$ and divide it by the total retweeted amount  (${\sum_{v\in P_{\tau_i}}{R_u(v)}}$) during $\tau_i$, having as a result the proportion of retweets ($\sigma_{\tau_i}$) needed from a user to become outlier during $\tau_i$. Then we'll input this proportion $\sigma_{\tau_i}$  in the weekly distribution of retweet counts ($P_j$), week by week during the breakpoints, we'll get weekly outliers of the user. We will get a sense of stability of the network given the level of activity with the jaccard index between a week outliers and the next week outliers. We'll also compute.
+$$
+\begin{align*}
+\text{for }  i &= 1\ldots \#breakpoints: \\
+
+\sigma_{\tau_i}&=\frac{\text{OutlierFrontier}(P_{\tau_i})}{\sum_{v\in P_{\tau_i}}{R_u(v)}}\\
+ T_i &\sim \text{Poisson}(\text{rate}=\lambda_i)\\
+ &\text{for }  j = 1\ldots \#weeks: \\
+ & \text{Outliers}'_{ij}(P_j)=\left\{o|\frac{R_u(o)}{\sum_{v\in P_j} R_u(v)}>\sigma_{\tau_i}\right\}
+ \end{align*}
+$$
+
+In this framework we will compute the following features, for every week:
+
+- Number of outliers: number of outliers that fall in the higher end of the frontier in the retweet counts per week.
+
+- Number of new outliers: the number of new outliers that we haven't seen before in the previous weeks. This number will be higher at the beggining of the study, as we won't have seen that much profiles.
+
+- Jaccard index: the jaccard index is computed with the formula:
+  $$
+  J(\text{Outliers}'_{i,j},\text{Outliers}'_{i,j+1})=\frac{|\text{Outliers}'_{i,j}\cap\text{Outliers}'_{i,j+1}|}{|{Outliers}'_{i,j}\cup\text{Outliers}'_{i,j+1}|}
+  $$
+  It will give us a notion of stability in that week.
+
+### Example
+
+We will analyse the example of the congresswoman Inés Arrimadas from party Ciudadanos. In the period of time`15/08/2019-11/11/2019` we encounter the leader of the party nearly every week in its outliers, Albert Rivera. Then `11/11/2019` Albert Rivera, announces its retirement from politics and steps down as the leader party, other outliers become more important, and we can see how the jaccard index decreases and the new outliers per week increases in the following months. But we also observe that in confinement period the behaviour of those variables changes a lot more than with the step down of the leader.
+
+Example of the network evolution of Inés Arrimadas.
+
+|           Week | jaccard  | New outliers | Total outliers | Outliers                                            |
+| -------------: | -------- | ------------ | -------------- | --------------------------------------------------- |
+|     2019-09-30 | 0.5      | 0            | 3              | [Albert_Rivera, CiudadanosCs, Lroldansu]            |
+|     2019-10-07 | 0.666667 | 0            | 2              | [CiudadanosCs, Albert_Rivera]                       |
+|            ... |          |              |                |                                                     |
+| **2019-11-11** | 0        | 0            | 0              | []                                                  |
+|     2019-11-18 | 0        | 1            | 3              | [CiudadanosCs, **davidmartinezg**, carrizosacarlos] |
+|     2019-11-25 | 0        | 1            | 1              | [**JuanMarin_Cs**]                                  |
+
+<figure style="text-align:center">
+    <iframe height='320' scrolling='no' src='../tfm-plots/networks-ines-1.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
+    <figcaption>Fig.5 - Example of jaccard index for a timeline of the congresswoman Inés Arrimadas</figcaption>
+</figure>
+
+<figure style="text-align:center">
+    <iframe height='435' scrolling='no' src='../tfm-plots/networks-ines-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
+    <figcaption>Fig.6 - Number of weekly outliers by Inés Arrimadas.</figcaption>
+</figure>
+
+<figure style="text-align:center">
+    <iframe height='435' scrolling='no' src='../tfm-plots/networks-ines-3.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
+    <figcaption>Fig.6 - RT and text count for Inés Arrimadas for every week.</figcaption>
+</figure>
+
+### Global analysis
+
+We would like to see if the observed behaviour for our example can be also found in a global scall with all the users we have.
+
+If we look at the overall picture of the jaccard index, we see is very smoothed as we have a lot of users, but we can begin to see the a low value in the end of december and in the beggining of march. If we observe those dates in the number of outliers, we see two different behaviours, while in December we have less outliers per week, people probably retweeted less, and had less or no outliers in general in March we have a peak in the number of outliers. These two decreases in the jaccard index have two different explainations: in march a lot of users retweeted a lot, and more outliers were found.
 
 <figure style="text-align:center">
     <iframe height='320' scrolling='no' src='../tfm-plots/networks-jaccard-corrected-total.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
     <figcaption>Fig.5 - Clustering score for ego-node.</figcaption>
 </figure>
+
+
+
+<figure style="text-align:center">
+    <iframe height='320' scrolling='no' src='../tfm-plots/networks-count-outlier-corrected.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
+    <figcaption>Fig.6 - Clustering score for ego-node.</figcaption>
+</figure>
+
+This phenomenon is amplified if we look only at politicians and journalist, probably because we have less profiles.
+
 <figure style="text-align:center">
     <iframe height='435' scrolling='no' src='../tfm-plots/networks-jaccard-corrected-types.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
     <figcaption>Fig.6 - Clustering score for ego-node.</figcaption>
 </figure>
-
-
-<figure style="text-align:center">
-    <iframe height='520' scrolling='no' src='../tfm-plots/networks-count-outlier-corrected.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
-    <figcaption>Fig.6 - Clustering score for ego-node.</figcaption>
-</figure>
-
 
 
 <figure style="text-align:center">
