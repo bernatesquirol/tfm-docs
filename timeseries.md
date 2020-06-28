@@ -1,28 +1,30 @@
 # Time series analysis
 
-In this section we'll try a first approach to measure the impact of the Spanish confinement in twitter user activity. The data that we have consists of 17.000 timelines of Twitter users. We will calculate some of our measurements with the aggregated data of some users, some of them will be done with several examples and some of them will be computed with each of the timelines in the dataset.
+In this section we will try a first approach to measure the impact of the Spanish confinement in twitter user activity. The data that we have consists of **17.000** timelines of Twitter users. We will calculate some of our measurements with the aggregated data of some users, some of them will be done with several examples and some of them will be computed with each of the timelines in the dataset.
 
 ##  Seasonality and trends
 
-We'll pick several timelines as example (700) and we will calculate the autocorrelation plot (`acf`), for every one of them and see if overall there is some seasonality.
+We will pick several timelines as example (700) and we will calculate the autocorrelation plot (`acf`), for every one of them and see if there is some seasonality overall.
 
 When we calculate the mean over all `acf`s, we can see spikes at each $k$ multiple of 7. This means a clear tendency towards a weekly frequency period.
 
 <figure style="text-align:center">
-    <iframe height='320' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-mean-acf.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
+    <iframe height='320' scrolling='no' src='../tfm-plots/timeseries-mean-acf.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
     <figcaption>Fig.1 - Mean acf for 700 samples.</figcaption>
 </figure>
 
+
 ## Linear breakpoints
 
-As our goal is to try to measure the effect of an intervention (confinement) in the overall set of users, it'll be useful to get a more simplified version of the timeseries, one that just gets the *essential* information, as we are dealing with a lot of timeseries. This method here will be applied to the whole set of timeseries.  The function `breakpoints` in `R` package `strucchange` gives us the optimal points where to break the time series so there is the least amount of breakpoints possible that describe the best the original time series.  Although it can be done in python, there is no efficient method to get the same result, and as we are dealing with a lot of timeseries, we'll stick to `R` with the wrapper for python `rpy`. 
+As our goal is to try to measure the effect of an intervention (confinement) in the overall set of users, it will be useful to get a more simplified version of the timeseries, one that just gets the *essential* information, as we are dealing with a lot of timeseries. To do that we will not only find the optimal breakpoints to divide the timeseries in, but also the number of breakpoints that makes the model less complex while describing the model correctly. The function `breakpoints` in `R` package `strucchange` gives us exactly that. Although it can be done in python, there is no efficient method to get the same result, and as we are dealing with a lot of timeseries, we will stick to `R` with the wrapper for python `rpy`. 
 
-We'll go through an example of timeline to see how this function internally works. We'll pick one example for the sake of explainability, with the Twitter activity plotted in $\text{Fig.1}$.
+We will go through an example of timeline to see how this function works internally. We will pick one example for the sake of explainability, with the Twitter activity plotted in $\text{Fig.1}$.
 
 <figure style="text-align:center">
-    <iframe height='340' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-example-breakpoints.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='340' scrolling='no' src='../tfm-plots/timeseries-example-breakpoints.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.2 - Activity of user 1000092194961838080.</figcaption>
 </figure>
+
 
 
 
@@ -44,26 +46,27 @@ def get_breakpoints_and_levels(id_user):
     return {freq.index[int(i)]:fitted[int(i)] for i in [0.0]+list(breakpoints[0])}
 ```
 
-Internally what the function `breakpoints`does is optimizes a piecewise linear fit, for each $i$ number of breaks, up to $n$ (maximum number of breaks), and it compares among the `i`'s which is the best optimized interval. It does this by using Bayesian Information criterion $(BIC)$. $BIC$ is a common criterion to do model selection among finite set of models. It's a way to measure the maximum likelihood of a function with the minimum amount of complexity (without overfitting). We can see the results for this in the figure 2. We'll stablish the maximum number of breaks in $n=5$.
+Internally what the function `breakpoints`does is optimize a piecewise linear fit, for each $i$ number of breakpoints, up to $n$ (maximum number of breaks); and it compares among the *i*'s which has the lowest Bayesian Information criterion $(BIC)$. $BIC$ is a common criterion to do model selection among finite set of models. It is a way to measure the maximum likelihood of a function (goodness of fit to the real data) with the minimum amount of complexity (without overfitting). We can see the results for this in $\text{Fig.} 2$. We will establish the maximum number of breaks in $n=5$.
 
 <figure style="text-align:center">
-    <img src='https://bernatesquirol.github.io/tfm-plots/static/timeseries-BIC-breakpoints.png' height=350>
+    <img src='../tfm-plots/static/timeseries-BIC-breakpoints.png' height=350>
     <figcaption>Fig.3 - BIC for the optimized interval for each number of breakpoints. In the case of the example the best description of the timeseries with the least breakpoints is with 3 breakpoints (4 intervals)</figcaption>
 </figure>
+
 
 
 
 Another `R` function that appears in the code is `fitted`, retrieves the level of each interval, also computed by the `breakpoints` function. The final result for each
 
 <figure style="text-align:center">
-    <iframe height='340' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-example-breakpoints-s.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='340' scrolling='no' src='../tfm-plots/timeseries-example-breakpoints-s.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.3 - Activity of user 1000092194961838080 with breakpoints and levels.</figcaption>
 </figure>
 
 
-As we did this for every profile in the dataset, we'll try to see some general insights. One of the problems that we'll encounter throughout this paper is the what we will call *initial date problem*. This consists in not having a consistent date from which we begin to have the activities of the user activities in our data. This is because we took the timelines not homogenously and also Twitter API gets only the latest 3200 activities from a user, that creates a correlation between the first recorded date of the user and its activity frequency. When we want to extract general conclusions of how a period of time affected the users we need to take that into account. 
 
-For this we'll compute the jump value for every timeline, that means for each breakpoint, we'll compute  how much it changed from previous value. To not have frequency biases we'll normalize this value for the mean of the timeline. 
+As we did this for every profile in the dataset, we will try to see some general insights. In order to do this we will compute the jump value for every timeline, that means for each breakpoint, how much the tweet frequency of the user changed from the previous value. Normalize this jump value for the mean frequency of the timeline, will help avoiding frequency biases in the overall picture. 
+
 $$
 \begin{equation*}
 \bar N:= \text{observed mean}\\
@@ -83,39 +86,46 @@ $$
 \end{equation}
 $$
 
-With the label **`levels_dict`** we'll add a dictionary with keys $\tau_i$ and values $L_i$ as as a feature in our users database.
+With the label **`levels_dict`** we will add a dictionary with keys $\tau_i$ and values $L_i$ as a feature in our users database.
 
 ## Analysis
 
-In this section we'll analyse certain aspects of the features we have computed so far.
+In this section we will analyse certain aspects of the features we have computed so far.
 
 ### Seasonality
 
-We have computed the `seasonal_decompose` of each timeline in our database, that means decomposing the activity in (additive) trend/seasonal/residual series. The plot in $\text{Fig.4}$ we can see the differences between user types. We have a lot less politicians than any other group, this why is so different than the other types.
+We have computed the `seasonal_decompose` of each timeline in our database, that means decomposing the activity in (additive) trend/seasonal/residual series. The plot in $\text{Fig.4}$ we can see the differences between user types. We can see a Tuesday-Friday activity in politicians that align well with typical political weekly cycles.
 
 <figure style="text-align:center">
-    <iframe height='420' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-seasonal-type.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='420' scrolling='no' src='../tfm-plots/timeseries-seasonal-type.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.4 - Sum of changes relative to the mean (J') from all timelines.</figcaption>
 </figure>
+
 ### Breakpoints
 
-Here we plot the number of breakpoints per type of user, we can see that is mostly similar among user types. We can also see a trend towards 2-3 breaks and not more, so we can say that the maximum of 5 breakpoints we stablished was a good enough approach.
+Here we plot the number of breakpoints for each user type. We can see that it is quite similar among user types. We can also see a trend towards 2-3 breaks and not more, and few users reach the 5 breakpoints. Consequently we can say our maximum number of breakpoints was good enough.
 
 <figure style="text-align:center">
-    <iframe height='370' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-breakpoints-analysis.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.5 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
+    <iframe height='370' scrolling='no' src='../tfm-plots/timeseries-breakpoints-analysis.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.5 - Number of breakpoints for each user type</figcaption>
 </figure>
+
 ### Levels
 
+We can see here the sum of $J'$ for all users in our dataset.
+
 <figure style="text-align:center">
-    <iframe height='820' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-sum-js-types.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='520' scrolling='no' src='../tfm-plots/timeseries-sum-js-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.7 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
+</figure>
+
+<figure style="text-align:center">
+    <iframe height='820' scrolling='no' src='../tfm-plots/timeseries-sum-js-types.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.6 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
 
-<figure style="text-align:center">
-    <iframe height='520' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/timeseries-sum-js-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.7 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
-</figure>
+
+
 
 
 

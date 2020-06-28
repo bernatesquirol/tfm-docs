@@ -8,11 +8,11 @@ In order to measure the impact in several ways we will create different models. 
 2. [Bayesian model](./bayesian.html)
 3. [Ego networks analysis](./networks.html)
 
-First we will take a look at the data from a global perspective as well as explain how we gathered it. Then we will create a Bayesian model as simple as we can for each user, in order to measure the impact of confinement in user's activity. Finally we will try to unveil the differences of the fitted model among the groups of users and study their characteristics. **FALTEN EGO**
+First we will take a look at the data from a global perspective as well as explain how we gathered it. In order to measure the impact of confinement in user's activity. Then we will create two models: one based on timeseries intervention analysis and another based on a Bayesian model as simple as we can for each user. Finally we will introduce the concepts of ego-networks and ego-networks evolution in time and analyse it during the period of confinement. All of this will be done while trying to unveil the differences of the fitted models among the groups of users and study their characteristics.
 
 ## Database
 
-We have a database with the details of each user, from the endpoint [`users/show`](https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-show) in Twitter API. This details include the number of followers/friends, total number of tweets/likes, and so on. We will define several computed user features **along** the paper, and add them as new columns to this database.
+We have a database with the details of each user, from the endpoint [`users/show`](https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-show) in Twitter API. This details include the number of followers/friends, total number of tweets/likes, and so on. We will define several computed user features in the paper, and add them as new columns to this database. We will be adding new features as we progress in the paper to this user database. They will all be styled like **`this`**.
 
 We also have a *light* version of every user's timeline. A timeline is the collection of tweets a user has created. We use the endpoint [`statuses/user_timeline`](https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline) from Twitter API to get the latest 3200 tweets for a given user. This is very problematic in our use case as different users have different tweeting frequencies and as we want to understand overall behaviour through time, the observation start is correlated to the frequency of the user.
 
@@ -36,7 +36,7 @@ Of course all of these features are for what we know of the user timeline. So th
 - **`observed_start`**: date at which the observation of the timeline starts
 - **`observed_end`**: date at which the observation of the timeline ends
 
-We'll be adding new features as we progress in the paper to this user database. They will all be styled like **`this`**.
+
 
 ## Users
 
@@ -70,14 +70,29 @@ With the label **`type_profile`** we will set the user type for each user in the
 
 ## Temporality
 
-There is one issue that affects the data that we gathered, specifically the user timelines, and can introduce some biases. Twitter API, can only give us the last 3200 tweets from a user, that means that we will have different starting dates from different users, and the starting date will be correlated with the frequency of tweet of the user, as we won't get as much back in time with the profiles that tweet a lot. It is important to know this bias and take it into account, as we will plot a lot of global timelines. 
+There is one issue that affects the data that we gathered, specifically the user timelines, and can introduce some biases. Twitter API, can only give us the last 3200 tweets from a user, that means that we will have different starting dates from different users, and the starting date will be correlated with the frequency of tweet of the user, as we won't get as much back in time with the profiles that tweet a lot. It is important to know this bias and take it into account, as we will plot a lot of global timelines, for all users, and for user types. We should divide the timeseries value for the user starting date bias, every time that we plot a timeline.
+
+<figure style="text-align:center">
+    <iframe height='420' scrolling='no' src='../tfm-plots/intro-bias.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
+    <figcaption>Fig.3 - Bias in the starting date of our observations.</figcaption>
+</figure>
+
+## Overall behaviour
+
+To start to gain intuition about our data, we will plot the number of tweets per week for all our timelines. We will compute the how many tweets per week a user created and we will normalize between weeks (so the more active week gets a 1 and the least active week gets a 0). The sum all of these levels of activity per week (divided by the starting date bias) together is plotted in $\text{Fig.3}$. We can already see a bump in the plot while the confinement.
+
+<figure style="text-align:center">
+    <iframe height='320' scrolling='no' src='../tfm-plots/intro-overall-activity-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
+    <figcaption>Fig.4 - Activity per week for all our users.</figcaption>
+</figure>
 
 
 
-[plot]
+Also we can look at how the type of twitter activity changes. For example we can look at the mean ratio of retweets per week between all users.
 
-[plot per types]
+<figure style="text-align:center">
+    <iframe height='320' scrolling='no' src='../tfm-plots/intro-overall-ratio-rt.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
+    <figcaption>Fig.4 - Retweet ratio mean for all users.</figcaption>
+</figure>
 
-## General tweet behaviour
-
-how users behaved in general in Spain the last few months, by computing frequencies of tweets alone, but not general behaviours of users, which we'll do later.
+In the following sections, we will try to define ways to analyse one user behaviour by creating simplistic models that gather the important information, and then we will gather all models to visualize the impact of COVID19 in Twitter.
