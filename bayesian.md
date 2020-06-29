@@ -70,7 +70,7 @@ After this, we need to create the kernel, where tensorflow optimizes the functio
 
 ## Model test
 
-we will fit a series of artificial data, some of which will follow the prior, and some of which won't, to see how well the model behaves. In order to create artificial timelines, we will create a key valued dictionary $\tau_i$ and $L_i$, that will be similar to breakpoints and levels dictionary we created in the [linear breakpoints](./timeseries.html#linear-breakpoints) section in the timeseries study. The dictionary has as keys ($\tau_i$) the dates of the breakpoints and as values ($\lambda_i=L_i$) the value of the expected tweet activity for the following period. The first key is always the beginning of the timeseries.
+We will fit a series of artificial data, some of which will follow the prior, and some of which won't, to see how well the model behaves. In order to create artificial timelines, we will create a key valued dictionary $\tau_i$ and $L_i$, that will be similar to breakpoints and levels dictionary we created in the [linear breakpoints](./timeseries.html#linear-breakpoints) section in the timeseries study. The dictionary has as keys ($\tau_i$) the dates of the breakpoints and as values ($\lambda_i=L_i$) the value of the expected tweet activity for the following period. The first key is always the beginning of the timeseries.
 
 we will use `pvalue` to get a notion of model fitness to the real data. We used an adaptation of the frequentist Kolmogorov-Smirnov test.  We compute different artificial datasets based on the output of the model, and average the `pvalue` of the KS-test between those artificial datasets and the real data (in the case of the following examples is also artificial). If the `pvalue` is really low the
 
@@ -94,8 +94,9 @@ we will use `pvalue` to get a notion of model fitness to the real data. We used 
 
 <figure style="text-align:center">
     <iframe height='425' scrolling='no' src='../tfm-plots/bayesian-test-3-7-jan.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.2 - Change λ from 3 to 7 at 10th Mar.</figcaption>
+    <figcaption>Fig.3 - Change λ from 3 to 7 at 10th Mar.</figcaption>
 </figure>
+
 
 We can see two immediate observations from the previous plots:
 
@@ -110,22 +111,25 @@ The real data may have more than one switch, but our model assumes there is just
 
 <figure style="text-align:center">
     <iframe height='425' scrolling='no' src='../tfm-plots/bayesian-test-3-7-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.2 - Change λ from 3 to 7 at 10th Mar.</figcaption>
+    <figcaption>Fig.4 - Change λ from 3 to 7 at 10th Mar.</figcaption>
 </figure>
+
 
 - $\text{E5}$: `{2019-09-12: 1, 2019-10-12: 5, 2020-03-02: 2}`, `pvalue=0.50`
 
 <figure style="text-align:center">
     <iframe height='425' scrolling='no' src='../tfm-plots/bayesian-test-3-7-2-bis.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.3 - Change λ from 3 to 7 at 10th Mar.</figcaption>
+    <figcaption>Fig.5 - Change λ from 3 to 7 at 10th Mar.</figcaption>
 </figure>
+
 
 - $\text{E6}$: `{2019-09-12: 1, 2019-11-13: 5, 2020-01-13: 1, 2020-03-14: 5}`, `pvalue=0.01`
 
 <figure style="text-align:center">
     <iframe height='425' scrolling='no' src='../tfm-plots/bayesian-test-1-5-1-5.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.4 - Change λ from 1 to 5 at 13th Oct and 14 Apr.</figcaption>
+    <figcaption>Fig.6 - Change λ from 1 to 5 at 13th Oct and 14 Apr.</figcaption>
 </figure>
+
 In the previous examples we can see how in case of two changes, or three changes, the model will get only one of them. We can see how the `pvalue` is way lower in $\text{Fig.4}$. We can conclude we can use the `pvalue` as a way of knowing if there are some existing breakpoints in the data that we missed in the model. When the `pvalue` is low doesn't mean that the model is wrong, the model will have choosen one of the breakpoints that the data will have, but probably other breakpoints may exist.
 
 ### Real data
@@ -136,19 +140,21 @@ For every timeline in the database, we fitted the model previously mentioned. Le
 
 <figure style="text-align:center">
     <iframe height='425' scrolling='no' src='../tfm-plots/real-case-1.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.5 - Real example.</figcaption>
+    <figcaption>Fig.7 - Real example.</figcaption>
 </figure>
+
 
 - `user_id=112894609, pvalue=0.0036`
 
 <figure style="text-align:center">
     <iframe height='425' scrolling='no' src='../tfm-plots/multi-lambda.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.6 - Multi lambda example.</figcaption>
+    <figcaption>Fig.8 - Multi lambda example.</figcaption>
 </figure>
+
 
 The $\text{Fig.6}$ shows something new. If we look at both distributions of $\lambda_i$ they appear to have a binormal distribution. If we look at the $\tau$ we can also see two bumps, one in February 22nd and another in March. What is happening here, is that there are two switchpoints, the rising in February and the decreasing of activity in March. We can see how the rising in March corresponds probably to the part of $\lambda_2 \sim 7.5$ (as $\lambda_1$ needs to be lower that $\lambda_2$) and after March, we would have a $\lambda_3\sim5.6$, that is hidden in $\lambda_2$. This will happen whenever the $\lambda_i$ are near and there are two switches. 
 
-To test the hypotesis that another breakpoint would create a better model, based on the dictionary: `{2020-02-22:6.4, 2020-02-22:7.5, 2020-03-22:5.4}`, with a second breakpoint ($\tau_2$), and a $\lambda_3$, taking into account the bimodality of $\tau$ and $\lambda_i$. We adapted the `pvalue` test to create multiple timelines from that dictionary, and we found a higher `pvalue=0.015`, while the model with only one switchpoint has a `pvalue=0.0036`.
+To test the hypothesis that another breakpoint would create a better model, based on the dictionary: `{2020-02-22:6.4, 2020-02-22:7.5, 2020-03-22:5.4}`, with a second breakpoint ($\tau_2$), and a $\lambda_3$, taking into account the bimodality of $\tau$ and $\lambda_i$. We adapted the `pvalue` test to create multiple timelines from that dictionary, and we found a higher `pvalue=0.015`, while the model with only one switchpoint has a `pvalue=0.0036`.
 
 ## Other Models
 
@@ -167,15 +173,16 @@ $$
  T_i &\sim \text{Poisson}(\text{rate}=\lambda_i)
 \end{align*}
 $$
-In our data this model can remove a bit of uncertainty in the $\tau$, as we don't need a sudden break in the data.
+In our data this model can remove a bit of uncertainty in the $\tau$, as we don't need a sudden break in the data. As we see in the 
 
 <figure style="text-align:center">
     <iframe height='620' scrolling='no' src='../tfm-plots/bayesian-switch-sigmoid.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.7 - Multi lambda example.</figcaption>
+    <figcaption>Fig.9 - Multi lambda example.</figcaption>
 </figure>
+
 **Multilevel model**
 
-Another model we could try, similar to what we did in [breakpoints section]['breakpoints'] is allowing the model to have more than two levels. The difference here is we set up a maximum number of levels ($L_{\text{max}}$) the model can have but no maximum amount of breakpoints between those levels.
+Another thing we could try is allowing the model to have more than two levels. This model will resemble the model created in the timeseries [breakpoints section](https://bernatesquirol.github.io/tfm-docs/timeseries.html#linear-breakpoints). The difference here is we set up a maximum number of levels ($L_{\text{max}}$) the model can have but no maximum amount of breakpoints between those levels.
 $$
 \begin{aligned}
 \lambda_{0} & \sim \text { Categorical }\left(\left\{\frac{1}{L_{\text{max}}},...,\frac{1}{L_{\text{max}}}\right\}\in v^{L_{\text{max}}}\right) \\
@@ -192,10 +199,12 @@ As it happened with the breakpoints model, we will have to run it with several $
 
 <figure style="text-align:center">
     <img src='../tfm-plots/static/bayesian-multilevel.png' height=450>
-    <figcaption>Fig.8 - </figcaption>
+    <figcaption>Fig.10 - Example of multi-level model </figcaption>
 </figure>
 
-This model has the advantage that fits the data better, but the computation time and the simplicity of the result are worse than the linear breakpoints model. For example we can see that the 4-state has a small spike at day $35$, this is useful to analyse one day behaviour, and we wouldn't pick this one with the linear breakpoints model, but when we look at changes that remain through time, the linear breakpoints model probably introduces less noise.
+
+
+This model has the advantage that fits the data more accurately, but the computation time and the simplicity of the result are worse than the linear breakpoints model. For example we can see that the 4-state has a small spike at day $35$, this is useful to analyse one day behaviour, and we wouldn't pick this one with the linear breakpoints model, but when we look at changes that remain through time, the linear breakpoints model probably introduces less noise. 
 
 ## Analysis
 
@@ -210,17 +219,20 @@ J:=L_{2}-L_{1}\\
 J':=\frac{J}{\bar T}
 \end{equation*}
 $$
-Similar to what we have done in the breakpoints section, we plot two different series, one for the positive values of $J'$ and the other for the negative values. In $\text{Fig. 9}$ we see plotted the resulting timeline of $\tau*\tilde{\lambda}_{dif}$ for every type of user and in $\text{Fig. 10}$ the overall timeline for all the users.
+Similar to what we have done in the breakpoints section, we plot two different series, one for the positive values of $J'$ and the other for the negative values. In $\text{Fig. 9}$ we see plotted the resulting timeline of $\tau*\tilde{\lambda}_{dif}$ for every type of user and in $\text{Fig. 10}$ the overall timeline for all the users. And as always we have to take into account the observation start date bias.
 
 <figure style="text-align:center">
     <iframe height='820' scrolling='no' src='../tfm-plots/bayesian-type-changes-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.9 - Multi lambda example.</figcaption>
+    <figcaption>Fig.11 - Overall frequency behaviour change for each user type.</figcaption>
 </figure>
 
 <figure style="text-align:center">
     <iframe height='520' scrolling='no' src='../tfm-plots/bayesian-global-changes-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.10 - Multi lambda example.</figcaption>
+    <figcaption>Fig.11 - Overall frequency behaviour change for all users.</figcaption>
 </figure>
+
+
+
 
 
 

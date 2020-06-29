@@ -27,8 +27,6 @@ We will go through an example of timeline to see how this function works interna
 
 
 
-
-
 The following code creates the breakpoints and retrieves the level of each interval:
 
 ```python
@@ -59,9 +57,10 @@ Internally what the function `breakpoints`does is optimize a piecewise linear fi
 Another `R` function that appears in the code is `fitted`, retrieves the level of each interval, also computed by the `breakpoints` function. The final result for each
 
 <figure style="text-align:center">
-    <iframe height='340' scrolling='no' src='../tfm-plots/timeseries-example-breakpoints-s.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <iframe height='540' scrolling='no' src='../tfm-plots/timeseries-example-breakpoints-s.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.3 - Activity of user 1000092194961838080 with breakpoints and levels.</figcaption>
 </figure>
+
 
 
 
@@ -94,7 +93,7 @@ In this section we will analyse certain aspects of the features we have computed
 
 ### Seasonality
 
-We have computed the `seasonal_decompose` of each timeline in our database, that means decomposing the activity in (additive) trend/seasonal/residual series. The plot in $\text{Fig.4}$ we can see the differences between user types. We can see a Tuesday-Friday activity in politicians that align well with typical political weekly cycles.
+We have computed the `seasonal_decompose` of each timeline in our database, that means decomposing the activity in (additive) trend/seasonal/residual series. The plot in $\text{Fig.4}$ we can see the differences between user types. We can see a Tuesday-Friday activity cycle in politicians that align well with typical political weekly cycles.
 
 <figure style="text-align:center">
     <iframe height='420' scrolling='no' src='../tfm-plots/timeseries-seasonal-type.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
@@ -112,174 +111,18 @@ Here we plot the number of breakpoints for each user type. We can see that it is
 
 ### Levels
 
-We can see here the sum of $J'$ for all users in our dataset.
+We can see here the sum of $J'$ for all users in our dataset. This values give us the first way to measure the change in user behaviour to COVID19. The green lines represent users changing its activity to a higher level, and red ones to a lower level.
 
 <figure style="text-align:center">
     <iframe height='520' scrolling='no' src='../tfm-plots/timeseries-sum-js-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.7 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
-</figure>
-
-<figure style="text-align:center">
-    <iframe height='820' scrolling='no' src='../tfm-plots/timeseries-sum-js-types.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
     <figcaption>Fig.6 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
 
-
-
-
-
-
-
-
-## ARIMA models
-
-We will fit and test three ARIMA models in our example with the help of the information we gathered so far.  
-
-**Model 1: autoarima**
-
-```python
-model_1 = robjects.r['auto.arima'](env['freq_tweet'], trace=True)
-```
-
-```R
-Fitting models using approximations to speed things up...
- ARIMA(0,1,0)                    : 1392.701
- ARIMA(0,1,0) with drift         : 1394.732
- ARIMA(0,1,1)                    : 1297.803
- ARIMA(0,1,1) with drift         : 1299.847
- ARIMA(0,1,2)                    : 1296.231
- ARIMA(0,1,2) with drift         : 1298.283
- ARIMA(1,1,0)                    : 1348.734
- ARIMA(1,1,0) with drift         : 1350.78
- ARIMA(1,1,1)                    : 1297.113
- ARIMA(1,1,1) with drift         : 1299.162
- ARIMA(1,1,2)                    : 1299.158
- ARIMA(1,1,2) with drift         : 1301.218
- ARIMA(2,1,0)                    : 1327.977
- ARIMA(2,1,0) with drift         : 1330.04
- ARIMA(2,1,1)                    : 1302.686
- ARIMA(2,1,1) with drift         : 1304.751
- ARIMA(2,1,2)                    : 1300.697
- ARIMA(2,1,2) with drift         : 1302.793
-
-Best model: ARIMA(0,1,2) 
-Coefficients:
-          ma1      ma2
-
-      -0.6861  -0.1220
-
-s.e.   0.0616   0.0649
-sigma^2 estimated as 9.385:  log likelihood=-646.8
-AIC=1299.61   AICc=1299.7   BIC=1310.23
-```
-
-
-
-**Model 2: seasonal (lag=7)**
-
-If we take the weekly seasonality into account, we can see a small improvements in the model.
-
-```python
-model_2_1 = robjects.r['Arima'](
-    env['freq_tweet'], 
-    order = robjects.IntVector([0,1,2]),
-    seasonal =  robjects.r['list'](order = robjects.IntVector([0,0,1]), period = 7), 
-)
-```
-
-```R
-Coefficients:
-          ma1      ma2    sma1
-
-      -0.6861  -0.1333  0.0900
-
-s.e.   0.0609   0.0660  0.0605
-sigma^2 estimated as 9.339:  log likelihood=-645.7
-AIC=1299.39   AICc=1299.55   BIC=1313.56
-```
-
-```python
-model_2_2 = robjects.r['Arima'](
-    env['freq_tweet'], 
-    order = robjects.IntVector([0,1,2]),
-    seasonal =  robjects.r['list'](order = robjects.IntVector([1,0,0]), period = 7), 
-)
-```
-
-```R
-Coefficients:
-          ma1      ma2    sar1
-      -0.6858  -0.1341  0.0989
-s.e.   0.0609   0.0662  0.0632
-sigma^2 estimated as 9.331:  log likelihood=-645.58
-AIC=1299.16   AICc=1299.32   BIC=1313.32
-```
-
-
-
-**Model 3: seasonal with shift regressors**
-
-If we check again the `auto.arima` function, this time with regressors, we get the best
-
-```python
-model_3_1 = robjects.r['auto.arima'](env['freq_tweet'], trace=True, xreg=fitted, )
-```
-
-```R
-Best model: Regression with ARIMA(0,0,1) errors
-Coefficients:
-         ma1    xreg
-      0.1873  0.9999
-s.e.  0.0589  0.0510
-
-sigma^2 estimated as 8.258:  log likelihood=-632.5
-AIC=1270.99   AICc=1271.09   BIC=1281.63
-```
-
-If we add temporality:
-
-```python
-model_3_2 =  robjects.r['Arima'](
-    env['freq_tweet'], 
-    order = robjects.IntVector([0,0,1]), 
-    xreg=fitted,
-    seasonal =  robjects.r['list'](order = robjects.IntVector([1,0,0]), period = 7),
-)
-```
-
-```R
-Coefficients:
-         ma1    sar1  intercept    xreg
-      0.1731  0.1685    -0.1312  1.0363
-s.e.  0.0596  0.0624     0.4733  0.1136
-
-sigma^2 estimated as 8.086:  log likelihood=-628.89
-AIC=1267.78   AICc=1268.02   BIC=1285.5
-```
-
-When fitting the arima model with regressors we have that, if we want to predict, we need the regressor as input, the level at which we predict. If we could have an overall estimate of how the level changes for the user, we could predict with the regressor model an accurate timeline for the user.
-
-**Residuals of the models**
-
 <figure style="text-align:center">
-    <iframe height='520' scrolling='no' src='https://bernatesquirol.github.io/tfm-plots/residuals-slider.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.8 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
+    <iframe height='820' scrolling='no' src='../tfm-plots/timeseries-sum-js-types-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
+    <figcaption>Fig.7 - Sum of changes relative to the mean of the jump between levels (J') from all timelines.</figcaption>
 </figure>
 
-The p-values for our models are in the following table. We can see how model 3.1 presents p-values less than 0.1 in some of the lags. We should not consider the 3.1 model for further research. 
-
-| k\model | 1        | 2_1      | 2_2      | 3_1          | 3_2      |
-| ------: | -------- | -------- | -------- | ------------ | -------- |
-|       1 | 0.871256 | 0.676499 | 0.905459 | 0.704804     | 0.803445 |
-|       2 | 0.985991 | 0.913195 | 0.975867 | 0.770529     | 0.883243 |
-|       3 | 0.986286 | 0.942512 | 0.979900 | 0.491782     | 0.547569 |
-|       4 | 0.997578 | 0.982539 | 0.994038 | 0.426820     | 0.454997 |
-|       5 | 0.986176 | 0.979301 | 0.992030 | 0.520453     | 0.552379 |
-|       6 | 0.801770 | 0.992874 | 0.997364 | **0.087242** | 0.666250 |
-|       7 | 0.879470 | 0.997623 | 0.999127 | **0.092944** | 0.600149 |
-|       8 | 0.841681 | 0.988918 | 0.994982 | 0.135140     | 0.693404 |
-|       9 | 0.855799 | 0.990754 | 0.995835 | 0.189310     | 0.770193 |
-|      10 | 0.903568 | 0.995453 | 0.998018 | 0.252571     | 0.832601 |
 
 ## References
 
@@ -287,7 +130,7 @@ The p-values for our models are in the following table. We can see how model 3.1
 
 <a name="ref2">**[ 2 ]**</a>: Giorgio Garziano. (2017). *ARIMA models and Intervention Analysis*. https://www.r-bloggers.com/arima-models-and-intervention-analysis/
 
-<a name="ref3">**[ 3 ]**</a>:Cryer, Jonathan &amp; Chan, K.-S. (2008). *Time Series Analysis: With Applications in R*. 10.1007/978-0-387-75959-3. https://www.springer.com/us/book/9780387759586 
+<a name="ref3">**[ 3 ]**</a>: Cryer, Jonathan &amp; Chan, K.-S. (2008). *Time Series Analysis: With Applications in R*. 10.1007/978-0-387-75959-3. https://www.springer.com/us/book/9780387759586 
 
 
 

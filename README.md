@@ -18,7 +18,7 @@ We also have a *light* version of every user's timeline. A timeline is the colle
 
 <figure style="text-align:center">
     <iframe frameborder="0" style="width:100%;height:400px;" src="https://app.diagrams.net/?lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=DataFlowTFM.drawio#Uhttps%3A%2F%2Fdrive.google.com%2Fuc%3Fid%3D1tN6wTtX5RHvi6GIQ_Q8gyoJfQpMo24I3%26export%3Ddownload"></iframe>
-<figcaption>Fig.1 - Data flow.</figcaption>
+<figcaption>Fig.1.1 - Data flow.</figcaption>
 </figure>
 
 
@@ -58,11 +58,11 @@ Our method works as following:
 2. We filter those 100 tweets such that the creator of the tweet has a minimum of followers, friends and actions. The user $u_0$ will be the creator of the tweet. If we take directly user $u_0$ as our random user we would have a bias towards users that tweet a lot, high frequency.
 3. Instead what we do is get one of the followers or the friends of $u_0$. We can get as much as 5000 in one API call to [`friends/ids`](https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friends-ids) or [`followers/ids`](https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-followers-ids). Our final user will be a sample of the ids given by the call.
 
-Our method gets two types of random users: *random_friends* are those that we find using ` friends/ids` call, and *random_followers* using `followers/ids`. The first group biased towards following a lot of people and the other biased towards having a lot of followers. Having these two sets is not ideal, and they are also biased, as we can see in $\text{Fig.1}$, but we avoid having biases in the frequency of tweet, that we will be analysing deeply.
+Our method gets two types of random users: *random_friends* are those that we find using ` friends/ids` call, and *random_followers* using `followers/ids`. The first group biased towards following a lot of people and the other biased towards having a lot of followers. Having these two sets is not ideal, and they are also biased, as we can see in $\text{Fig.1.1}$, but we avoid having biases in the frequency of tweet, that we will be analysing deeply.
 
 <figure style="text-align:center">
     <iframe height='425' scrolling='no' src='../tfm-plots/random-types-bias.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'></iframe>
-    <figcaption>Fig.2 - Bias in random profile types (max 5000 followers/following).</figcaption>
+    <figcaption>Fig.1.2 - Bias in random profile types (max 5000 followers/following).</figcaption>
 </figure>
 
 
@@ -74,16 +74,16 @@ There is one issue that affects the data that we gathered, specifically the user
 
 <figure style="text-align:center">
     <iframe height='420' scrolling='no' src='../tfm-plots/intro-bias.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
-    <figcaption>Fig.3 - Bias in the starting date of our observations.</figcaption>
+    <figcaption>Fig.1.3 - Bias in the starting date of our observations.</figcaption>
 </figure>
 
 ## Overall behaviour
 
-To start to gain intuition about our data, we will plot the number of tweets per week for all our timelines. We will compute the how many tweets per week a user created and we will normalize between weeks (so the more active week gets a 1 and the least active week gets a 0). The sum all of these levels of activity per week (divided by the starting date bias) together is plotted in $\text{Fig.3}$. We can already see a bump in the plot while the confinement.
+To start to gain intuition about our data, we will plot the number of tweets per week for all our timelines. We will compute the how many tweets per week a user created and we will normalize between weeks (so the more active week gets a 1 and the least active week gets a 0). The sum all of these levels of activity per week (divided by the starting date bias) together is plotted in $\text{Fig.1.3}$. We can already see a bump in the plot while the confinement.
 
 <figure style="text-align:center">
     <iframe height='320' scrolling='no' src='../tfm-plots/intro-overall-activity-2.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
-    <figcaption>Fig.4 - Activity per week for all our users.</figcaption>
+    <figcaption>Fig.1.4 - Activity per week for all our users.</figcaption>
 </figure>
 
 
@@ -92,7 +92,8 @@ Also we can look at how the type of twitter activity changes. For example we can
 
 <figure style="text-align:center">
     <iframe height='320' scrolling='no' src='../tfm-plots/intro-overall-ratio-rt.html' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 99.99%;'>	</iframe>
-    <figcaption>Fig.4 - Retweet ratio mean for all users.</figcaption>
+    <figcaption>Fig.1.5 - Retweet ratio mean for all users.</figcaption>
 </figure>
+
 
 In the following sections, we will try to define ways to analyse one user behaviour by creating simplistic models that gather the important information, and then we will gather all models to visualize the impact of COVID19 in Twitter.
